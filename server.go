@@ -526,6 +526,13 @@ func Serve(opts *ServeConfig) {
 }
 
 func serverListener(unixSocketCfg UnixSocketConfig) (net.Listener, error) {
+	// Add a way to force the server to use TCP
+	envServerType := os.Getenv("PLUGIN_SERVER_TYPE")
+	if envServerType == "tcp" {
+		return serverListener_tcp()
+	} else if envServerType == "unix" {
+		return serverListener_unix(unixSocketCfg)
+	}
 	if runtime.GOOS == "windows" {
 		return serverListener_tcp()
 	}
